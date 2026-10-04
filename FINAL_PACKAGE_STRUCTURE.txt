@@ -1,0 +1,3 @@
+SPRINTNOVA FINAL CLEAN PACKAGE
+
+This is the integrated SprintNova application. Use this single project root; do not run separate Learn/Source projects.

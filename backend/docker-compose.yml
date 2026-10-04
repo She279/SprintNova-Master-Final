@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sprintnova
+      POSTGRES_PASSWORD: sprintnova
+      POSTGRES_DB: sprintnova
+    ports:
+      - "5432:5432"
+    volumes:
+      - sprintnova_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sprintnova"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://sprintnova:sprintnova@db:5432/sprintnova
+      COMPANY_EMAIL_DOMAIN: sprintnova.com
+      JWT_SECRET_KEY: change-this-to-a-long-random-value
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+      EMAIL_PROVIDER: console
+      OTP_LENGTH: "6"
+      OTP_EXPIRE_MINUTES: "10"
+      OTP_MAX_ATTEMPTS: "5"
+      TEMP_PASSWORD_LENGTH: "12"
+
+volumes:
+  sprintnova_pgdata:
